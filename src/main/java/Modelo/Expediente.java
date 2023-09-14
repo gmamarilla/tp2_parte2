@@ -5,6 +5,7 @@
 package Modelo;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  *
@@ -22,6 +23,40 @@ public class Expediente extends Documento{
         this.letra = letra;
         this.anio = anio;
         this.anexo = anexo;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + Objects.hashCode(this.nro);
+        hash = 47 * hash + Objects.hashCode(this.letra);
+        hash = 47 * hash + Objects.hashCode(this.anio);
+        hash = 47 * hash + Objects.hashCode(this.anexo);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Expediente other = (Expediente) obj;
+        if (!Objects.equals(this.letra, other.letra)) {
+            return false;
+        }
+        if (!Objects.equals(this.anexo, other.anexo)) {
+            return false;
+        }
+        if (!Objects.equals(this.nro, other.nro)) {
+            return false;
+        }
+        return Objects.equals(this.anio, other.anio);
     }
     
     @Override

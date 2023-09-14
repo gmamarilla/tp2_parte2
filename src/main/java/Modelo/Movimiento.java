@@ -5,6 +5,7 @@
 package Modelo;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  *
@@ -21,6 +22,40 @@ public class Movimiento {
         this.fechaMov = fechaMov;
         this.areaOrigen = areaOrigen;
         this.areaDestino = areaDestino;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + Objects.hashCode(this.id);
+        hash = 41 * hash + Objects.hashCode(this.fechaMov);
+        hash = 41 * hash + Objects.hashCode(this.areaOrigen);
+        hash = 41 * hash + Objects.hashCode(this.areaDestino);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Movimiento other = (Movimiento) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.fechaMov, other.fechaMov)) {
+            return false;
+        }
+        if (!Objects.equals(this.areaOrigen, other.areaOrigen)) {
+            return false;
+        }
+        return Objects.equals(this.areaDestino, other.areaDestino);
     }
     
     //getters & setters

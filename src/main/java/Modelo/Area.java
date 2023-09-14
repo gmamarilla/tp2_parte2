@@ -22,23 +22,54 @@ public class Area {
         this.id = id;
         this.nomArea = nomArea;
         this.telefono = telefono;
+        
         this.documentos=new HashMap();
     }
     
-    public Documento buscarDocumento(Integer idDocumento){
-        return documentos.get(idDocumento);
-    }
+    //funcionalidades
     
-    public void agregarDocumento(Documento documento){
+    public void agregarDocumento(Documento documento) throws Exception{
+        if(tieneDocumento(documento)){
+            throw new Exception("El documento ID"+documento.getId()+" ya está cargado en el sistema.");
+        }
+        
         documentos.put(documento.getId(), documento);
     }
     
-    public void quitarDocumento(Documento documento){
+    public Documento buscarDocumento(Integer idDoc) throws Exception{
+        if(!tieneDocumento(id)){
+            throw new Exception("El documento ID"+idDoc+" no existe en el sistema.");
+        }
+        
+        return documentos.get(idDoc);
+    }
+    
+    public void quitarDocumento(Documento documento) throws Exception{
+        if(!tieneDocumento(documento)){
+            throw new Exception("El documento no está cargado en el sistmea.");
+        }
+        
         documentos.remove(documento.getId());
     }
     
+    public boolean tieneDocumentos(){
+        return !documentos.isEmpty();
+    }
+    
     public boolean tieneDocumento(Documento documento){
+        if(documentos.isEmpty()){
+            return false;
+        }
+        
         return documentos.containsKey(documento.getId());
+    }
+    
+    public boolean tieneDocumento(Integer idDoc){
+        if(documentos.isEmpty()){
+            return false;
+        }
+        
+        return documentos.containsKey(idDoc);
     }
 
     @Override

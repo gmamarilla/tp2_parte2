@@ -26,20 +26,22 @@ public class Sistema {
     
     //funcionalidades
     
+    //ABM DOCUMENTO
+    
     public void crearMovimiento(Integer id, LocalDate fechaMov, Area areaDestino, Documento documento) throws Exception{
         Movimiento nuevoMovimiento;
         Area areaOrigen=this.areaDelDocumento(documento);
         
-        if(areaOrigen==null){
-            throw new Exception("El documento no está cargado en el sistema.");
+        if(!areas.contains(areaOrigen)){
+            throw new Exception("Área de origen no existe.");
         }
         
-        if(!this.areas.contains(areaDestino)){
+        if(!areas.contains(areaDestino)){
             throw new Exception("Área de destino no existe.");
         }
         
-        if(!this.documentos.containsKey(documento.getId())){
-            throw new Exception("El documento no se encuentra en el sistema.");
+        if(!existeDocumento(documento)){
+            throw new Exception("El documento ID"+documento.getId()+" no se encuentra en el sistema.");
         }
         
         if(areaOrigen.equals(areaDestino)){
@@ -61,11 +63,11 @@ public class Sistema {
         
         Expediente nuevoExpediente=new Expediente(nro, letra, anio, anexo, idDoc, fechaCreacion);
         
-        if(this.existeDocumento(nuevoExpediente)){
+        if(existeDocumento(nuevoExpediente)){
             throw new Exception("Ya existe un documento con el ID #"+nro+" en el sistema.");
         }
         
-        if(!this.existeArea(area)){
+        if(!existeArea(area)){
             throw new Exception("El área "+area.getNomArea()+" no existe.");
         }
         
@@ -79,11 +81,11 @@ public class Sistema {
         
         Nota nuevaNota=new Nota( nro, anio, asunto, idDoc, fechaCreacion);
         
-        if(this.existeDocumento(nuevaNota)){
+        if(existeDocumento(nuevaNota)){
             throw new Exception("Ya existe un documento con el ID #"+nro+" en el sistema.");
         }
         
-        if(!this.existeArea(area)){
+        if(!existeArea(area)){
             throw new Exception("El área "+area.getNomArea()+" no existe.");
         }
         
@@ -95,36 +97,48 @@ public class Sistema {
     public void crearCorrespondencia(String remitente, String direccion,
                                     Integer idDoc, LocalDate fechaCreacion, Area area) throws Exception{
         Correspondencia nuevaCorr;
+        nuevaCorr=new Correspondencia(remitente, direccion, idDoc,  fechaCreacion);
         
-        if(this.buscarDocumento(idDoc)!=null){
+        if(existeDocumento(nuevaCorr)){
             throw new Exception("Ya existe un documento con el ID #"+idDoc+" en el sistema.");
         }
         
-        if(!areas.contains(area)){
+        if(!existeArea(area)){
             throw new Exception("El área "+area.getNomArea()+" no existe.");
         }
-        
-        nuevaCorr=new Correspondencia(remitente, direccion, idDoc,  fechaCreacion);
         
         area.agregarDocumento(nuevaCorr);
         
         documentos.put(nuevaCorr.getId(), nuevaCorr);
     }
     
-    public boolean existeDocumento(Documento documento){
-        return this.documentos.containsKey(documento.getId());
-    }
-    
-    public Area buscarArea(String nombreArea){
-        
-        for(Area area:areas){
-            if(area.getNomArea().equalsIgnoreCase(nombreArea)){
-                return area;
-            }
+    public Documento buscarDocumento(int idDoc) throws Exception{
+        if(!documentos.containsKey(idDoc)){
+            throw new Exception("El documento ID"+idDoc+" no está cargado en el sistema.");
         }
         
-        return null;
+        return documentos.get(idDoc);
     }
+    
+    public void borrarDocumento(Integer idDoc) throws Exception{
+        Documento documento = documentos.get(idDoc);
+        
+        if(documento.tieneMovmientos()){
+            throw new Exception("No se puede borrar un documento que tiene movimientos.");
+        }
+        
+        documentos.remove(idDoc);
+    }
+    
+    public boolean existeDocumento(Documento documento){
+        if(documentos.isEmpty()){
+            return false;
+        }
+        
+        return documentos.containsKey(documento.getId());
+    }
+    
+    //ABM AREA
     
     public Area crearArea(Integer id, String nomArea, String telefono) throws Exception{
         Area nuevaArea=new Area( id,  nomArea,  telefono);
@@ -138,7 +152,42 @@ public class Sistema {
         return nuevaArea;
     }
     
+    public Area buscarArea(String nombreArea) throws Exception{
+        if(areas.isEmpty()){
+            throw new Exception("El sistema no tiene áreas cargasdas.");
+        }
+        
+        for(Area area:areas){
+            if(area.getNomArea().equalsIgnoreCase(nombreArea)){
+                return area;
+            }
+        }
+        
+        return null;
+    }
+    
+    public void editarArea(Area area, String nomArea, String telefono) throws Exception{
+        if(existeArea(area)){
+            throw new Exception("El área "+area.getNomArea()+" no está cargada en el sistema.");
+        }
+        
+        area.setNomArea(nomArea);
+        area.setTelefono(telefono);
+    }
+    
+    public void borrarArea(Area area) throws Exception{
+        if(area.tieneDocumentos()){
+            throw new Exception("No se puede borrar un área que tiene documentos cargados.");
+        }
+        
+        areas.remove(area);
+    }
+    
     public boolean existeArea(Area area){
+        if(areas.isEmpty()){
+            return false;
+        }
+        
         return areas.contains(area);
     }
     
@@ -152,12 +201,12 @@ public class Sistema {
         return null;
     }
     
-    public Documento buscarDocumento(int idDoc){
-        return documentos.get(idDoc);
-    }
-    
-    public ArrayList<Documento> buscarDocumentosPorFecha(LocalDate fecha){
+    public ArrayList<Documento> buscarDocumentosPorFecha(LocalDate fecha) throws Exception{
         ArrayList<Documento> busqueda=new ArrayList();
+        
+        if(documentos.isEmpty()){
+            throw new Exception("El sistema no tiene documentos cargados.");
+        }
         
         this.documentos.forEach((Integer key,Documento documento)->{
             

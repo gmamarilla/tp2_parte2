@@ -9,7 +9,6 @@ package Vista;
 import Controlador.Sistema;
 import Modelo.*;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 
 /**
@@ -50,6 +49,7 @@ public class Tp2_parte2 {
             }
         }catch(Exception e){
             System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
